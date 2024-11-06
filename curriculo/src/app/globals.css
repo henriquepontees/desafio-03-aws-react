@@ -3,9 +3,16 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary_text: rgba(24, 25, 31, 1);
+  --secondary_text: rgba(255, 255, 255, 1);
+  --tertiary_text: rgba(209, 213, 219, 1);
+  --primary_color: rgba(9, 188, 138, 1);
+  --secondary_color: rgba(0, 67, 70, 1);
+  --card_color: rgba(80, 137, 145, 1);
+  --dark_green: rgba(23, 42, 58, 1);
+  --just_red: rgba(153, 32, 32, 1);
 }
+
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -14,8 +21,43 @@
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+
+.bg-primary_text {
+  background-color: var(--primary_text);
+}
+
+.text-primary_text {
+  color: var(--primary_text);
+}
+
+.text-secondary_text {
+  color: var(--secondary_text);
+}
+
+.bg-primary_color {
+  background-color: var(--primary_color);
+}
+
+.bg-secondary_color {
+  background-color: var(--secondary_color);
+}
+
+
+.btn-primary {
+  @apply bg-primary_color text-secondary_text font-semibold py-2 px-4 rounded hover:bg-opacity-80 transition;
+}
+
+
+.btn-secondary {
+  @apply bg-secondary_color text-secondary_text font-semibold py-2 px-4 rounded hover:bg-opacity-80 transition;
+}
+
+
+.box {
+  @apply bg-secondary_text border border-gray-200 p-4 rounded-lg shadow-md;
+}
+
+
+.heading {
+  @apply text-primary_text font-bold text-2xl leading-[1.3];
 }
