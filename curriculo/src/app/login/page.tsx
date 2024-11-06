@@ -1,7 +1,19 @@
+"use client"
+import { useState, ChangeEvent } from 'react';
 import { FaArrowRight } from 'react-icons/fa';
 import { TbBrandGithubFilled } from 'react-icons/tb';
 
 export default function Login() {
+
+  const [username, setUsername] = useState<string>('');
+
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setUsername(e.target.value);
+  };
+
+  const isButtonDisabled = username.trim() === '';
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <main className="w-full inline-block">
@@ -15,17 +27,20 @@ export default function Login() {
         </header>
         <section>
           <div className="flex items-center space-x-2 w-max mx-auto mb-6">
-            <input
-              type="text"
-              id="username"
-              placeholder="Digite o nome do usuário"
-              className="px-4 py-2 border border-gray-900 rounded-2xl bg-secondary_text text-primary_text placeholder-tertiary_text"
-              style={{ width: '46rem', height: '56px', border: '1.5px solid' }}
-            />
+          <input
+            type="text"
+            id="username"
+            placeholder="Digite o nome do usuário"
+            className="px-4 py-2 border border-gray-900 rounded-2xl bg-secondary_text text-primary_text placeholder-tertiary_text focus:outline-none focus:border-gray-900"
+            style={{ width: '46rem', height: '56px' }}
+            value={username}
+            onChange={handleInputChange}
+          />
             <button
               type="submit"
-              className="flex items-center justify-center px-4 py-2 bg-secondary_color text-white rounded-2xl hover:bg-opacity-80"
-              style={{ height: '56px', width: '83px', marginLeft: '17.2px' }}
+              className={`flex items-center justify-center px-4 py-2 border border-gray-900 rounded-2xl text-secondary_text ${ isButtonDisabled ? 'bg-tertiary_text cursor-not-allowed ' : 'bg-secondary_color ' }`}
+              style={{ height: '56px', width: '83px', marginLeft: '17.2px'}}
+              disabled={isButtonDisabled}
             >
               <FaArrowRight size={30} />
             </button>
