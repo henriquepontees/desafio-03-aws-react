@@ -2,8 +2,26 @@
 import { useState, ChangeEvent } from 'react';
 import { FaArrowRight } from 'react-icons/fa';
 import { TbBrandGithubFilled } from 'react-icons/tb';
+import { app } from '../../../firebaseConfig'
+import { GithubAuthProvider, getAuth, signInWithPopup } from 'firebase/auth';
+import { useRouter } from 'next/navigation'; 
 
 export default function Login() {
+
+  const githubProvider = new GithubAuthProvider();
+  const auth = getAuth(app);
+  const router = useRouter();
+
+  const githubSignUp = () => {
+    signInWithPopup(auth, githubProvider)
+    .then((response) => {
+      console.log(response.user)
+      router.push('/home');
+    } )
+    .catch((error) => {
+      console.error("Erro ao autenticar com GitHub", error);
+    });
+  }
 
   const [username, setUsername] = useState<string>('');
 
@@ -60,7 +78,7 @@ export default function Login() {
             <span className="text-primary_text font-sans text-lg mr-4" style={{ fontSize: '24px', fontWeight: 700, lineHeight: '40px' }}>
               Acesse sua conta com
             </span>
-            <button className="flex items-center bg-dark_green text-secondary_text py-2 px-4 rounded-3xl" style={{ fontSize: '16px', fontWeight: 700 }}>
+            <button className="flex items-center bg-dark_green text-secondary_text py-2 px-4 rounded-3xl" style={{ fontSize: '16px', fontWeight: 700 }} onClick={githubSignUp}>
               <TbBrandGithubFilled size={20} className="mx-1" />
               GitHub
             </button>
