@@ -4,27 +4,47 @@ import { FaArrowRight } from 'react-icons/fa';
 import { TbBrandGithubFilled } from 'react-icons/tb';
 import { app } from '../../../firebaseConfig'
 import { GithubAuthProvider, getAuth, signInWithPopup } from 'firebase/auth';
-import { useRouter } from 'next/navigation'; 
+import { useRouter } from 'next/navigation';
 
 export default function Login() {
-
   const githubProvider = new GithubAuthProvider();
   const auth = getAuth(app);
   const router = useRouter();
 
-  const githubSignUp = () => {
-    signInWithPopup(auth, githubProvider)
-    .then((response) => {
-      console.log(response.user)
-      router.push('/home');
-    } )
-    .catch((error) => {
+  const githubSignUp = async () => {
+    try {
+      const response = await signInWithPopup(auth, githubProvider);
+      console.log(response.user);
+      const credential = GithubAuthProvider.credentialFromResult(response);
+      const accessToken = credential?.accessToken;
+
+      if (accessToken) {
+        const userData = await fetchGithubData(accessToken);
+        localStorage.setItem('githubUser', JSON.stringify(userData));
+        router.push('/home');
+      }
+    } catch (error) {
       console.error("Erro ao autenticar com GitHub", error);
+    }
+  }
+
+  const fetchGithubData = async (token: string) => {
+    const res = await fetch('https://api.github.com/user', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
+
+    if (!res.ok) {
+      throw new Error('Erro ao buscar dados do GitHub');
+    }
+
+    const data = await res.json();
+    console.log('Dados do GitHub:', data);
+    return data;
   }
 
   const [username, setUsername] = useState<string>('');
-
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
@@ -45,18 +65,18 @@ export default function Login() {
         </header>
         <section>
           <div className="flex items-center space-x-2 w-max mx-auto mb-6">
-          <input
-            type="text"
-            id="username"
-            placeholder="Digite o nome do usuário"
-            className="px-4 py-2 border border-gray-900 rounded-2xl bg-secondary_text text-primary_text placeholder-tertiary_text focus:outline-none focus:border-gray-900"
-            style={{ width: '46rem', height: '56px' }}
-            value={username}
-            onChange={handleInputChange}
-          />
+            <input
+              type="text"
+              id="username"
+              placeholder="Digite o nome do usuário"
+              className="px-4 py-2 border border-gray-900 rounded-2xl bg-secondary_text text-primary_text placeholder-tertiary_text focus:outline-none focus:border-gray-900"
+              style={{ width: '46rem', height: '56px' }}
+              value={username}
+              onChange={handleInputChange}
+            />
             <button
               type="submit"
-              className={`flex items-center justify-center px-4 py-2 border border-gray-900 rounded-2xl text-secondary_text ${ isButtonDisabled ? 'bg-tertiary_text cursor-not-allowed ' : 'bg-secondary_color ' }`}
+              className={`flex items-center justify-center px-4 py-2 border border-gray-900 rounded-2xl text-secondary_text ${isButtonDisabled ? 'bg-tertiary_text cursor-not-allowed ' : 'bg-secondary_color '}`}
               style={{ height: '56px', width: '83px', marginLeft: '17.2px'}}
               disabled={isButtonDisabled}
             >
