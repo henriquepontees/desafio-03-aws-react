@@ -1,65 +1,78 @@
-"use client"
-import { useState, ChangeEvent } from 'react';
+"use client";
+import { useState, ChangeEvent, useEffect } from 'react';
 import { FaArrowRight } from 'react-icons/fa';
-import { TbBrandGithubFilled } from 'react-icons/tb';
-import { app } from '../../../firebaseConfig'
-import { GithubAuthProvider, getAuth, signInWithPopup } from 'firebase/auth';
+import { IoIosWarning } from 'react-icons/io';
 import { useRouter } from 'next/navigation';
+import Dropdown from '../components/DropDown';
+import GitHubLoginButton from '../components/GitHubLoginButton';
 
-export default function Login() {
-  const githubProvider = new GithubAuthProvider();
-  const auth = getAuth(app);
+interface User {
+  name: string;
+  avatar_url: string;
+}
+
+const Login = () => {
+
   const router = useRouter();
-
-  const githubSignUp = async () => {
-    try {
-      const response = await signInWithPopup(auth, githubProvider);
-      console.log(response.user);
-      const credential = GithubAuthProvider.credentialFromResult(response);
-      const accessToken = credential?.accessToken;
-
-      if (accessToken) {
-        const userData = await fetchGithubData(accessToken);
-        localStorage.setItem('githubUser', JSON.stringify(userData));
-        router.push('/home');
-      }
-    } catch (error) {
-      console.error("Erro ao autenticar com GitHub", error);
-    }
-  }
-
-  const fetchGithubData = async (token: string) => {
-    const res = await fetch('https://api.github.com/user', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!res.ok) {
-      throw new Error('Erro ao buscar dados do GitHub');
-    }
-
-    const data = await res.json();
-    console.log('Dados do GitHub:', data);
-    return data;
-  }
-
   const [username, setUsername] = useState<string>('');
+  const [users, setUsers] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedUsers = localStorage.getItem('githubUsers');
+    if (storedUsers) {
+      try {
+        const parsedUsers = JSON.parse(storedUsers);
+        if (Array.isArray(parsedUsers)) {
+          setUsers(parsedUsers);
+        }
+      } catch (error) {
+        console.error("Erro ao parsear dados do Local Storage:", error);
+      }
+    }
+  }, []);
+
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setUsername(e.target.value);
+    const value = e.target.value;
+    setUsername(value);
+  
+    if (value.trim()) {
+      const results = users.filter(user =>
+        user.name && user.name.toLowerCase().startsWith(value.toLowerCase())
+      );
+      setFilteredUsers(results);
+      setShowDropdown(results.length > 0);
+    } else {
+      setShowDropdown(false);
+    }
+  };
+
+  const handleSearch = () => {
+    const userExists = users.some(user => user.name && user.name.toLowerCase() === username.toLowerCase());
+  
+    if (userExists) {
+      router.push('/home');
+    } else {
+      setErrorMessage("O nome que você digitou não existe ou não está cadastrado!");
+      setShowDropdown(false);
+    }
+  };
+
+  const handleDropdownItemClick = (user: User) => {
+    localStorage.setItem('githubUser', JSON.stringify(user));
+    router.push('/home');
   };
 
   const isButtonDisabled = username.trim() === '';
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+<div className="flex min-h-screen items-center justify-center bg-background px-4">
       <main className="w-full inline-block">
         <header>
-          <h2
-            className="text-center font-sans text-primary_text mb-6 whitespace-nowrap"
-            style={{ fontSize: '40px', fontWeight: 700, lineHeight: '1.3' }}
-          >
+          <h2 className="text-center font-sans text-primary_text mb-6 whitespace-nowrap" style={{ fontSize: '40px', fontWeight: 700, lineHeight: '1.3' }}>
             Digite o nome do usuário que deseja buscar
           </h2>
         </header>
@@ -79,17 +92,28 @@ export default function Login() {
               className={`flex items-center justify-center px-4 py-2 border border-gray-900 rounded-2xl text-secondary_text ${isButtonDisabled ? 'bg-tertiary_text cursor-not-allowed ' : 'bg-secondary_color '}`}
               style={{ height: '56px', width: '83px', marginLeft: '17.2px'}}
               disabled={isButtonDisabled}
+              onClick={handleSearch}
             >
               <FaArrowRight size={30} />
             </button>
           </div>
+          <Dropdown
+            filteredUsers={filteredUsers}
+            showDropdown={showDropdown}
+            handleDropdownItemClick={handleDropdownItemClick}
+          />
+          {errorMessage && (
+            <p className="text-just_red text-center mt-4 flex items-center justify-center"
+                style={{ fontSize:'16px', marginRight:'22rem', fontWeight:600, marginTop: '-1.2rem',lineHeight: '40px' }}>
+              <IoIosWarning className="mr-2 text-just_red" size={25} />
+              {errorMessage}
+            </p>
+          )}
         </section>
         <section>
           <div className="flex items-center justify-center my-4">
             <div className="border-t bg-secondary_color" style={{ width: '24rem', height: '0.35rem' }}></div>
-            <span className="px-4 text-secondary_color font-sans text-lg" style={{ fontSize: '24px', fontWeight: 700, lineHeight: '40px' }}>
-              ou
-            </span>
+            <span className="px-4 text-secondary_color font-sans text-lg" style={{ fontSize: '24px', fontWeight: 700, lineHeight: '40px' }}>ou</span>
             <div className="border-t bg-secondary_color" style={{ width: '24rem', height: '0.35rem' }}></div>
           </div>
         </section>
@@ -98,13 +122,12 @@ export default function Login() {
             <span className="text-primary_text font-sans text-lg mr-4" style={{ fontSize: '24px', fontWeight: 700, lineHeight: '40px' }}>
               Acesse sua conta com
             </span>
-            <button className="flex items-center bg-dark_green text-secondary_text py-2 px-4 rounded-3xl" style={{ fontSize: '16px', fontWeight: 700 }} onClick={githubSignUp}>
-              <TbBrandGithubFilled size={20} className="mx-1" />
-              GitHub
-            </button>
+            <GitHubLoginButton />
           </div>
         </section>
       </main>
     </div>
   );
-}
+};
+
+export default Login;
