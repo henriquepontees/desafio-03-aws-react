@@ -1,23 +1,22 @@
-"use client";
-import { useState, ChangeEvent, useEffect } from 'react';
+"use client"
+import { useState, useEffect, useMemo, useCallback, ChangeEvent } from 'react';
 import { FaArrowRight } from 'react-icons/fa';
 import { IoIosWarning } from 'react-icons/io';
 import { useRouter } from 'next/navigation';
 import Dropdown from '../components/DropDown';
 import GitHubLoginButton from '../components/GitHubLoginButton';
+import useGithubAuth from '@/store/hooks/useGithubAuth';
 
 interface User {
   name: string;
   avatar_url: string;
 }
 
-const Login = () => {
-
+const Login = () => { console.log("chamou")
+  const { githubSignUp } = useGithubAuth();
   const router = useRouter();
   const [username, setUsername] = useState<string>('');
   const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  const [showDropdown, setShowDropdown] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -29,47 +28,43 @@ const Login = () => {
           setUsers(parsedUsers);
         }
       } catch (error) {
-        console.error("Erro ao parsear dados do Local Storage:", error);
+        console.error('Erro ao parsear dados do Local Storage:', error);
       }
     }
   }, []);
 
-
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setUsername(value);
-  
-    if (value.trim()) {
-      const results = users.filter(user =>
-        user.name && user.name.toLowerCase().startsWith(value.toLowerCase())
-      );
-      setFilteredUsers(results);
-      setShowDropdown(results.length > 0);
-    } else {
-      setShowDropdown(false);
-    }
-  };
-
-  const handleSearch = () => {
-    const userExists = users.some(user => user.name && user.name.toLowerCase() === username.toLowerCase());
-  
-    if (userExists) {
-      router.push('/home');
-    } else {
-      setErrorMessage("O nome que você digitou não existe ou não está cadastrado!");
-      setShowDropdown(false);
-    }
-  };
-
-  const handleDropdownItemClick = (user: User) => {
+  const handleDropdownItemClick = useCallback((user: User) => {
     localStorage.setItem('githubUser', JSON.stringify(user));
+    console.log('Usuário selecionado no Dropdown:', user);
     router.push('/home');
-  };
+  }, [router]);
+
+  const filteredUsers = useMemo(() => {
+    if (username.trim()) {
+      return users.filter(user =>
+        user.name && user.name.toLowerCase().startsWith(username.toLowerCase())
+      );
+    }
+    return [];
+  }, [username, users]);
 
   const isButtonDisabled = username.trim() === '';
 
+  const handleSearch = () => {
+    const userExists = users.some(user => user.name && user.name.toLowerCase() === username.toLowerCase());
+    console.log('Usuário existe:', userExists);
+
+    if (userExists) {
+      router.push('/home');
+    } else {
+      setErrorMessage('O nome que você digitou não existe ou não está cadastrado!');
+    }
+  };
+
+  const showDropdown = filteredUsers.length > 0;
+
   return (
-<div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <main className="w-full inline-block">
         <header>
           <h2 className="text-center font-sans text-primary_text mb-6 whitespace-nowrap" style={{ fontSize: '40px', fontWeight: 700, lineHeight: '1.3' }}>
@@ -85,31 +80,33 @@ const Login = () => {
               className="px-4 py-2 border border-gray-900 rounded-2xl bg-secondary_text text-primary_text placeholder-tertiary_text focus:outline-none focus:border-gray-900"
               style={{ width: '46rem', height: '56px' }}
               value={username}
-              onChange={handleInputChange}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
             />
             <button
               type="submit"
-              className={`flex items-center justify-center px-4 py-2 border border-gray-900 rounded-2xl text-secondary_text ${isButtonDisabled ? 'bg-tertiary_text cursor-not-allowed ' : 'bg-secondary_color '}`}
-              style={{ height: '56px', width: '83px', marginLeft: '17.2px'}}
+              className={`flex items-center justify-center px-4 py-2 border border-gray-900 rounded-2xl text-secondary_text ${isButtonDisabled ? 'bg-tertiary_text cursor-not-allowed' : 'bg-secondary_color'}`}
+              style={{ height: '56px', width: '83px', marginLeft: '17.2px' }}
               disabled={isButtonDisabled}
               onClick={handleSearch}
             >
               <FaArrowRight size={30} />
             </button>
           </div>
-          <Dropdown
-            filteredUsers={filteredUsers}
-            showDropdown={showDropdown}
-            handleDropdownItemClick={handleDropdownItemClick}
-          />
+          {showDropdown && (
+            <Dropdown
+              filteredUsers={filteredUsers}
+              showDropdown={showDropdown}
+              handleDropdownItemClick={handleDropdownItemClick}
+            />
+          )}
           {errorMessage && (
-            <p className="text-just_red text-center mt-4 flex items-center justify-center"
-                style={{ fontSize:'16px', marginRight:'22rem', fontWeight:600, marginTop: '-1.2rem',lineHeight: '40px' }}>
+            <p className="text-just_red text-center mt-4 flex items-center justify-center" style={{ fontSize: '16px', marginRight: '22rem', fontWeight: 600, marginTop: '-1.2rem', lineHeight: '40px' }}>
               <IoIosWarning className="mr-2 text-just_red" size={25} />
               {errorMessage}
             </p>
           )}
         </section>
+
         <section>
           <div className="flex items-center justify-center my-4">
             <div className="border-t bg-secondary_color" style={{ width: '24rem', height: '0.35rem' }}></div>
@@ -117,6 +114,7 @@ const Login = () => {
             <div className="border-t bg-secondary_color" style={{ width: '24rem', height: '0.35rem' }}></div>
           </div>
         </section>
+
         <section>
           <div className="flex items-center justify-center mt-8">
             <span className="text-primary_text font-sans text-lg mr-4" style={{ fontSize: '24px', fontWeight: 700, lineHeight: '40px' }}>

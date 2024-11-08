@@ -12,7 +12,7 @@ const GitHubLoginButton = () => {
       disabled={loading}
     >
       <TbBrandGithubFilled size={20} className="mx-1" />
-      {loading ? 'Carregando...' : 'GitHub'}
+      Github
     </button>
   );
 };
