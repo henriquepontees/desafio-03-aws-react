@@ -26,21 +26,8 @@ const useGithubAuth = () => {
       if (accessToken) {
         const userData = await fetchGithubData(accessToken);
 
-        const user = {
-          name: userData.name || userData.login,
-          avatar_url: userData.avatar_url,
-        };
-
-        const existingUsers = JSON.parse(localStorage.getItem('githubUsers') || '[]');
-
-        const userExists = existingUsers.some((existingUser: { name: string }) => existingUser.name === user.name);
-
-        if (!userExists) {
-          const updatedUsers = [...existingUsers, user];
-          localStorage.setItem('githubUsers', JSON.stringify(updatedUsers));
-        }
-
-        localStorage.setItem('githubUser', JSON.stringify(user));
+        localStorage.setItem('githubUser', JSON.stringify(userData));
+        
         router.push('/portfolio');
       } else {
         console.log("Token de acesso não encontrado");
