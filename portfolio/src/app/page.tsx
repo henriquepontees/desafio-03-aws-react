@@ -3,8 +3,8 @@ import { useState, useEffect, useMemo, useCallback, ChangeEvent } from 'react';
 import { FaArrowRight } from 'react-icons/fa';
 import { IoIosWarning } from 'react-icons/io';
 import { useRouter } from 'next/navigation';
-import Dropdown from '../components/DropDown';
-import GitHubLoginButton from '../components/GitHubLoginButton';
+import Dropdown from './components/DropDown';
+import GitHubLoginButton from './components/GitHubLoginButton';
 import useGithubAuth from '@/store/hooks/useGithubAuth';
 
 interface User {
@@ -12,7 +12,7 @@ interface User {
   avatar_url: string;
 }
 
-const Login = () => { console.log("chamou")
+const Login = () => {
   const { githubSignUp } = useGithubAuth();
   const router = useRouter();
   const [username, setUsername] = useState<string>('');
@@ -36,7 +36,7 @@ const Login = () => { console.log("chamou")
   const handleDropdownItemClick = useCallback((user: User) => {
     localStorage.setItem('githubUser', JSON.stringify(user));
     console.log('Usuário selecionado no Dropdown:', user);
-    router.push('/home');
+    router.push('/portfolio');
   }, [router]);
 
   const filteredUsers = useMemo(() => {
@@ -55,7 +55,7 @@ const Login = () => { console.log("chamou")
     console.log('Usuário existe:', userExists);
 
     if (userExists) {
-      router.push('/home');
+      router.push('/portfolio');
     } else {
       setErrorMessage('O nome que você digitou não existe ou não está cadastrado!');
     }

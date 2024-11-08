@@ -12,7 +12,7 @@ interface DropdownProps {
   handleDropdownItemClick: (user: User) => void;
 }
 
-const Dropdown: React.FC<DropdownProps> = React.memo(({ filteredUsers, showDropdown, handleDropdownItemClick }) => { console.log("chamou drop")
+const Dropdown: React.FC<DropdownProps> = React.memo(({ filteredUsers, showDropdown, handleDropdownItemClick }) => { 
 
     const handleClick = useCallback((user: User) => {
         handleDropdownItemClick(user);

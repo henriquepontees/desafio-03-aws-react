@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { GithubAuthProvider, getAuth, signInWithPopup } from 'firebase/auth';
 import { app } from '../../../firebaseConfig';
 import { useRouter } from 'next/navigation';
-import { fetchGithubData } from '@/utils/githubUtils';
+import { fetchGithubData } from '@/utils/api/githubUtils';
 
 const useGithubAuth = () => {
   const [loading, setLoading] = useState(false);
@@ -20,9 +20,7 @@ const useGithubAuth = () => {
       });
 
       const response = await signInWithPopup(auth, githubProvider);
-
       const credential = GithubAuthProvider.credentialFromResult(response);
-
       const accessToken = credential?.accessToken;
 
       if (accessToken) {
@@ -33,13 +31,17 @@ const useGithubAuth = () => {
           avatar_url: userData.avatar_url,
         };
 
-        localStorage.setItem('githubUser', JSON.stringify(user));
-
         const existingUsers = JSON.parse(localStorage.getItem('githubUsers') || '[]');
-        const updatedUsers = [...existingUsers, user];
-        localStorage.setItem('githubUsers', JSON.stringify(updatedUsers));
 
-        router.push('/home');
+        const userExists = existingUsers.some((existingUser: { name: string }) => existingUser.name === user.name);
+
+        if (!userExists) {
+          const updatedUsers = [...existingUsers, user];
+          localStorage.setItem('githubUsers', JSON.stringify(updatedUsers));
+        }
+
+        localStorage.setItem('githubUser', JSON.stringify(user));
+        router.push('/portfolio');
       } else {
         console.log("Token de acesso não encontrado");
       }
