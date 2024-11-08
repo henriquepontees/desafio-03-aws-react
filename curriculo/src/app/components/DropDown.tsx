@@ -22,7 +22,7 @@ const Dropdown: React.FC<DropdownProps> = React.memo(({ filteredUsers, showDropd
 
   return (
     <ul
-      className="border border-gray-300 rounded-md mt-2 overflow-y-auto bg-white absolute z-10 top-1/2 right-0 md:right-1/3"
+      className="border border-gray-300 rounded-md  pb-6 mt-2 overflow-y-auto bg-white absolute z-10 top-1/2 right-0 md:right-1/3"
       style={{
         width: '46rem',
         maxHeight: '300px',
@@ -32,7 +32,7 @@ const Dropdown: React.FC<DropdownProps> = React.memo(({ filteredUsers, showDropd
       {filteredUsers.map((user) => (
         <li
           key={user.name}
-          className="flex items-center p-2 m-2 border-b cursor-pointer"
+          className="flex items-center pb-2 m-4 border-b cursor-pointer"
           onClick={() => handleClick(user)}
           style={{ borderBottom: '1.5px solid' }}
         >
