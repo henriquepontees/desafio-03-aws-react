@@ -16,6 +16,7 @@ export const fetchGithubData = async (token: string) => {
     avatarUrl: data.avatar_url || null,
     profileUrl: data.html_url || null,
     name: data.name || data.login,
+    userName: data.login || null,
     location: data.location || null,
     email: data.email || null,
     bio: data.bio || null,

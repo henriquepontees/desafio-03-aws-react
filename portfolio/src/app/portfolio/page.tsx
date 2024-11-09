@@ -1,29 +1,27 @@
-"use client";
-import { useEffect, useState } from 'react';
+"use client"
+import { useEffect, useState } from "react";
+import UserGithubInfo from "../components/porfolio/UserGithubInfo";
 
-export default function Portfolio() {
+export default function Portfolio() { console.log("chamou")
   const [userData, setUserData] = useState<any>(null);
 
+
   useEffect(() => {
-    const storedUser = localStorage.getItem('githubUser');
+    const storedUser = localStorage.getItem("githubUser");
     if (storedUser) {
       setUserData(JSON.parse(storedUser));
     }
+
   }, []);
 
-  if (!userData) return <div>Carregando...</div>;
+  if (!userData) return <div>LOADING QUE VOU COLOCAR AINDA</div>;
+
 
   return (
-    <div className='m-4'>
-      <h1>Bem-vindo, {userData.name}</h1>
-      {userData.avatarUrl && <img src={userData.avatarUrl} alt={userData.name} />}
-      {userData.location && <p><strong>Localização:</strong> {userData.location}</p>}
-      {userData.email && <p><strong>Email:</strong> {userData.email}</p>}
-      {userData.name && <p><strong>Nome:</strong> {userData.name}</p>}
-      {userData.bio && <p><strong>Biografia:</strong> {userData.bio}</p>}
-      {userData.profileUrl && (
-        <p><strong>Perfil do GitHub:</strong> <a href={userData.profileUrl} target="_blank" rel="noopener noreferrer">{userData.profileUrl}</a></p>
-      )}
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <main className="w-full bg-secondary_text">
+        <UserGithubInfo userData={userData} />
+      </main>
     </div>
   );
 }

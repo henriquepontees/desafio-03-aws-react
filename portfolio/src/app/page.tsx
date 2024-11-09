@@ -3,8 +3,8 @@ import { useState, useEffect, useMemo, useCallback, ChangeEvent } from 'react';
 import { FaArrowRight } from 'react-icons/fa';
 import { IoIosWarning } from 'react-icons/io';
 import { useRouter } from 'next/navigation';
-import Dropdown from './components/DropDown';
-import GitHubLoginButton from './components/GitHubLoginButton';
+import Dropdown from './components/login/DropDown';
+import GitHubLoginButton from './components/login/GitHubLoginButton';
 import useGithubAuth from '@/store/hooks/useGithubAuth';
 
 interface User {
