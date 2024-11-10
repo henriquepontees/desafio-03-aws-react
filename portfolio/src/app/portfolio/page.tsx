@@ -8,6 +8,7 @@ import NewExperienceCard from "../components/porfolio/NewExperienceCard";
 import { FaInstagram, FaFacebook, FaTwitter, FaYoutube } from "react-icons/fa";
 import SocialMediaModal from "../components/porfolio/SocialMediaModal";
 import Footer from "../components/porfolio/Footer";
+import NavHeader from "../components/porfolio/NavHeader";
 
 export default function Portfolio() {
   const [userData, setUserData] = useState<any>(null);
@@ -19,6 +20,8 @@ export default function Portfolio() {
   const [isAddingNewExperience, setIsAddingNewExperience] = useState(false);
   const [bioText, setBioText] = useState<string>("");
   const [emailText, setEmailText] = useState<string>("");
+  const [tempBioText, setTempBioText] = useState<string>("");
+  const [tempEmailText, setTempEmailText] = useState<string>("");
   const [socialMediaLinks, setSocialMediaLinks] = useState([
     { platform: "Instagram", url: "" },
     { platform: "Facebook", url: "" },
@@ -27,6 +30,7 @@ export default function Portfolio() {
   ]);
   const [showSocialModal, setShowSocialModal] = useState(false);
   const [selectedSocialMedia, setSelectedSocialMedia] = useState<any>(null);
+  const [tempSocialMediaLinks, setTempSocialMediaLinks] = useState(socialMediaLinks);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("githubUser");
@@ -52,6 +56,18 @@ export default function Portfolio() {
   }, []);
 
   useEffect(() => {
+    const storedBioText = localStorage.getItem("bioText") || "";
+    const storedEmailText = localStorage.getItem("emailText") || "";
+    setBioText(storedBioText);
+    setEmailText(storedEmailText);
+
+    // Inicializa os estados temporários com os valores salvos
+    setTempBioText(storedBioText);
+    setTempEmailText(storedEmailText);
+  }, []);
+
+
+  useEffect(() => {
     if (isEditing) {
       setTempExperienceData([...experienceData]);
     }
@@ -67,6 +83,11 @@ export default function Portfolio() {
   const toggleEditMode = () => {
     if (isEditing) {
       setExperienceData(tempExperienceData);
+      setSocialMediaLinks(tempSocialMediaLinks);
+      setBioText(tempBioText);
+      setEmailText(tempEmailText);
+      localStorage.setItem("bioText", tempBioText);
+      localStorage.setItem("emailText", tempEmailText);
     }
     setIsEditing(!isEditing);
   };
@@ -117,11 +138,13 @@ export default function Portfolio() {
   };
 
   const handleSaveSocialMedia = (updatedSocialMedia: any) => {
-    setSocialMediaLinks((prevLinks) =>
-      prevLinks.map((link) =>
-        link.platform === updatedSocialMedia.platform ? updatedSocialMedia : link
-      )
-    );
+    if (isEditing) {
+      setTempSocialMediaLinks((prevLinks) =>
+        prevLinks.map((link) =>
+          link.platform === updatedSocialMedia.platform ? updatedSocialMedia : link
+        )
+      );
+    }
     setShowSocialModal(false);
   };
 
@@ -130,7 +153,8 @@ export default function Portfolio() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
       <main className="w-full bg-secondary_text">
-        <div className="flex justify-end w-full pt-8 pr-16">
+      <NavHeader />
+        <div className="flex justify-end w-full mt-24 pt-8 pr-16">
           <button
             onClick={toggleEditMode}
             className="bg-card_color text-secondary_text rounded-full w-28 h-28 flex items-center justify-center"
@@ -145,9 +169,9 @@ export default function Portfolio() {
           </h2>
           {isEditing ? (
             <textarea
-              value={bioText}
+              value={tempBioText}
               placeholder="adicione sua história"
-              onChange={(e) => setBioText(e.target.value)}
+              onChange={(e) => setTempBioText(e.target.value)}
               className="w-full p-4 text-secondary_text font-semibold bg-transparent focus:outline-none"
               style={{ fontSize: "24px" }}
             />
@@ -201,9 +225,9 @@ export default function Portfolio() {
             {isEditing ? (
               <input
                 type="text"
-                value={emailText}
+                value={tempEmailText}
                 placeholder="adicione um email adicional"
-                onChange={(e) => setEmailText(e.target.value)}
+                onChange={(e) => setTempEmailText(e.target.value)}
                 className="text-center w-full bg-transparent focus:outline-none"
                 style={{ fontSize: "64px" }}
               />
@@ -219,7 +243,6 @@ export default function Portfolio() {
           socialMediaLinks={socialMediaLinks}
           openSocialMediaModal={openSocialMediaModal}
         />
-
       </main>
       
       {showSocialModal && selectedSocialMedia && (

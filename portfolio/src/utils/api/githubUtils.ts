@@ -13,6 +13,7 @@ export const fetchGithubData = async (token: string) => {
   console.log(data);
 
   const formattedData = {
+    id: data.id,
     avatarUrl: data.avatar_url || null,
     profileUrl: data.html_url || null,
     name: data.name || data.login,

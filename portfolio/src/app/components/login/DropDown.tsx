@@ -3,7 +3,13 @@ import { FaUser } from 'react-icons/fa';
 
 interface User {
   name: string;
-  avatar_url: string;
+  avatarUrl: string;
+  id: any;
+  profile_url: string;
+  userName: string;
+  location: string;
+  email: string;
+  bio: string;
 }
 
 interface DropdownProps {
