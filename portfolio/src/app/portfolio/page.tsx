@@ -111,29 +111,37 @@ export default function Portfolio() {
           <h2 className="text-center text-4xl font-bold text-secondary_text pb-16" style={{ fontSize: "64px" }}>
             Experiências
           </h2>
-          <div className="grid grid-cols-2 gap-8">
-            {(isEditing ? tempExperienceData : experienceData).map((exp, index) => (
-              <ExperienceCard
-                key={index}
-                experience={exp}
-                index={index}
-                onClick={() => openModal(exp)}
-                onDelete={() => handleDeleteExperience(index)}
-                isEditing={isEditing}
-              />
-            ))}
-            {isEditing && (
-              <NewExperienceCard 
-                onClick={openAddNewCardModal} 
-                experienceDataLength={experienceData.length}
-                tempExperienceDataLength={tempExperienceData.length}
-              />
-            )}
-          </div>
+
+          {experienceData.length === 0 && !isEditing ? (
+            <p className="text-center text-tertiary_text " style={{ fontSize: "40px", fontWeight:400 }}>
+              Não há nada por aqui!
+            </p>
+          ) : (
+            <div className="grid grid-cols-2 gap-8">
+              {(isEditing ? tempExperienceData : experienceData).map((exp, index) => (
+                <ExperienceCard
+                  key={index}
+                  experience={exp}
+                  index={index}
+                  onClick={() => openModal(exp)}
+                  onDelete={() => handleDeleteExperience(index)}
+                  isEditing={isEditing}
+                />
+              ))}
+              {isEditing && (
+                <NewExperienceCard 
+                  onClick={openAddNewCardModal} 
+                  experienceDataLength={experienceData.length}
+                  tempExperienceDataLength={tempExperienceData.length}
+                />
+              )}
+            </div>
+          )}
         </section>
 
         {showModal && (
           <EditExperienceModal
+            isCreating={isAddingNewExperience}
             experience={selectedExperience}
             onClose={() => setShowModal(false)}
             onSave={handleModalSave}

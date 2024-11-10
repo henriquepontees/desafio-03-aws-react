@@ -15,15 +15,14 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({ experience, index, onCl
   return (
     <div
       onClick={onClick}
-      className={`bg-card_color p-8 border border-dark_green flex flex-col gap-4 cursor-pointer shadow-[8px_8px_0px_0px_rgba(9,188,138,1)] 
-      ${isHovered && isEditing ? "grid grid-rows-2 p-0" : "flex"} `}
+      className={`bg-card_color border border-dark_green flex flex-col gap-4 cursor-pointer shadow-[8px_8px_0px_0px_rgba(9,188,138,1)] 
+      ${isHovered && isEditing ? "grid grid-rows-2 " : "flex p-8"} `}
       style={{
         width: "409px",
         height: "503px",
         borderRadius: "20px",
         borderWidth: "3px",
         justifySelf: index % 2 === 0 ? "end" : "start",
-        transition: "all 0.3s ease-in-out",
       }}
       onMouseEnter={() => isEditing && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -67,10 +66,10 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({ experience, index, onCl
               href={experience.repositoryUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-auto text-secondary_text bg-dark_green font-semibold text-center p-2 rounded border border-primary_color hover:bg-primary_color hover:text-white transition-colors"
-              style={{ fontSize: "18px" }}
+              className="mt-auto text-secondary_text bg-dark_green font-semibold text-center p-2.5 rounded hover:bg-primary_color hover:text-white transition-colors"
+              style={{ fontSize: "24px" }}
             >
-              Ver Repositório
+              Ver repositório
             </a>
           )}
         </>

@@ -2,23 +2,25 @@ import { useState, useEffect } from "react";
 
 interface EditExperienceModalProps {
   experience: any;
+  isCreating: boolean;
   onClose: () => void;
   onSave: (updatedExperience: any) => void;
 }
 
-const EditExperienceModal: React.FC<EditExperienceModalProps> = ({ experience, onClose, onSave }) => {
-  const [editedExperience, setEditedExperience] = useState(experience || { title: '', date: '', skills: [], description: '' });
+const EditExperienceModal: React.FC<EditExperienceModalProps> = ({ experience, isCreating, onClose, onSave }) => {
+  const [editedExperience, setEditedExperience] = useState(
+    experience || { title: '', date: '', skills: [], description: '' }
+  );
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
   const handleExperienceChange = (field: string, value: string | string[]) => {
     setEditedExperience((prevExperience: any) => ({ ...prevExperience, [field]: value }));
   };
 
-  // Função para lidar com a mudança no campo de skills
   const handleSkillsChange = (value: string) => {
     handleExperienceChange("skills", value);
   };
 
-  // Função para processar as habilidades antes de salvar
   const processSkills = (skillsString: string) => {
     return skillsString.split(',').map(skill => skill.trim()).filter(skill => skill.length > 0);
   };
@@ -32,64 +34,80 @@ const EditExperienceModal: React.FC<EditExperienceModalProps> = ({ experience, o
     }
   }, [experience]);
 
+  useEffect(() => {
+    const { title, date, skills, description } = editedExperience;
+    setIsButtonDisabled(
+      !title || !date || !skills || !description
+    );
+  }, [editedExperience]);
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-zinc-500 bg-opacity-80 flex items-center justify-center">
       <div className="bg-white p-8 rounded-lg max-w-lg w-full">
-        <h2 className="text-3xl font-bold mb-4">Editar Experiência</h2>
+        <h2 className="text-4xl font-extrabold mb-8">
+          {isCreating ? "Criação de Card" : "Edição de Card"}
+        </h2>
         <div>
-          <label className="block text-xl">Título:</label>
           <input
             type="text"
+            placeholder="Título"
             value={editedExperience.title}
             onChange={(e) => handleExperienceChange("title", e.target.value)}
-            className="border p-2 w-full rounded"
+            className="border border-dark_green p-3 mb-8 w-full rounded"
           />
         </div>
         <div>
-          <label className="block text-xl">Data:</label>
           <input
             type="text"
+            placeholder="Período de atuação"
             value={editedExperience.date}
             onChange={(e) => handleExperienceChange("date", e.target.value)}
-            className="border p-2 w-full rounded"
+            className="border border-dark_green p-3 mb-8 w-full rounded"
           />
         </div>
         <div>
-          <label className="block text-xl">Descrição:</label>
+          <input
+            type="text"
+            placeholder="Habilidades (Separe-as por vírgula)"
+            value={editedExperience.skills}
+            onChange={(e) => handleSkillsChange(e.target.value)}
+            className="border border-dark_green p-3 mb-8 w-full rounded"
+          />
+        </div>
+        <div>
           <textarea
+            placeholder="Descreva sua experiência"
             value={editedExperience.description}
             onChange={(e) => handleExperienceChange("description", e.target.value)}
-            className="border p-2 w-full rounded"
+            className="border border-dark_green p-3 pb-24 mb-8 w-full rounded"
           />
         </div>
         <div>
-          <label className="block text-xl">Habilidades (separadas por vírgula):</label>
           <input
             type="text"
-            value={editedExperience.skills}
-            onChange={(e) => handleSkillsChange(e.target.value)} // Atualiza o campo de habilidades enquanto o usuário digita
-            className="border p-2 w-full rounded"
-            placeholder="Ex: JavaScript, React, Node.js"
-          />
-        </div>
-        <div>
-          <label className="block text-xl">Link do Repositório:</label>
-          <input
-            type="text"
+            placeholder="Link do repositório (Opcional)"
             value={editedExperience.repositoryUrl}
             onChange={(e) => handleExperienceChange("repositoryUrl", e.target.value)}
-            className="border p-2 w-full rounded"
+            className="border border-dark_green p-3 mb-8 w-full rounded"
           />
         </div>
-        <button
-          onClick={() => onSave({ ...editedExperience, skills: processSkills(editedExperience.skills) })}
-          className="bg-primary_color text-white px-4 py-2 rounded mt-4"
-        >
-          Salvar
-        </button>
-        <button onClick={onClose} className="bg-gray-400 text-white px-4 py-2 rounded mt-4 ml-2">
-          Cancelar
-        </button>
+        <div className="w-full flex justify-between">
+          <button
+            onClick={onClose}
+            className="bg-secondary_text border-2 border-dark_green w-full py-2 text-xl text-primary_text rounded"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={() => onSave({ ...editedExperience, skills: processSkills(editedExperience.skills) })}
+            className={`w-full py-2 ml-6 text-xl text-white rounded ${
+              isButtonDisabled ? "bg-tertiary_text" : "bg-dark_green"
+            }`}
+            disabled={isButtonDisabled}
+          >
+            Salvar
+          </button>
+        </div>
       </div>
     </div>
   );
