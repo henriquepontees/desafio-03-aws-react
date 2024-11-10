@@ -1,6 +1,7 @@
 // components/porfolio/Footer.tsx
 import React, { useState } from "react";
 import { FaPen } from "react-icons/fa";
+import { FaLocationDot } from "react-icons/fa6";
 
 interface SocialMediaLink {
   platform: string;
@@ -76,6 +77,14 @@ const Footer: React.FC<FooterProps> = ({
           );
         })}
       </div>
+      <div className="flex justify-center my-16 text-2xl font-semibold">
+        <p className="flex items-center">
+          <FaLocationDot className="mr-2" />
+          Brasil
+        </p>
+        <p className="ml-24">© 2024, All Rights By Compass UOL</p>
+      </div>
+
     </footer>
   );
 };
