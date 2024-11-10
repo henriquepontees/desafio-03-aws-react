@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { FaPen, FaCheck } from "react-icons/fa";
 import ExperienceCard from "../components/porfolio/ExperienceCard";
-import EditExperienceModal from "../components/porfolio/EditExperienceModal";
+import ExperienceModal from "../components/porfolio/ExperienceModal";
 import UserGithubInfo from "../components/porfolio/UserGithubInfo";
 import NewExperienceCard from "../components/porfolio/NewExperienceCard";
 
@@ -140,7 +140,7 @@ export default function Portfolio() {
         </section>
 
         {showModal && (
-          <EditExperienceModal
+          <ExperienceModal
             isCreating={isAddingNewExperience}
             experience={selectedExperience}
             onClose={() => setShowModal(false)}

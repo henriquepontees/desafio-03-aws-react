@@ -1,20 +1,20 @@
 import { useState, useEffect } from "react";
 
-interface EditExperienceModalProps {
+interface ExperienceModalProps {
   experience: any;
   isCreating: boolean;
   onClose: () => void;
   onSave: (updatedExperience: any) => void;
 }
 
-const EditExperienceModal: React.FC<EditExperienceModalProps> = ({ experience, isCreating, onClose, onSave }) => {
-  const [editedExperience, setEditedExperience] = useState(
+const ExperienceModal: React.FC<ExperienceModalProps> = ({ experience, isCreating, onClose, onSave }) => {
+  const [Experience, setExperience] = useState(
     experience || { title: '', date: '', skills: [], description: '' }
   );
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
   const handleExperienceChange = (field: string, value: string | string[]) => {
-    setEditedExperience((prevExperience: any) => ({ ...prevExperience, [field]: value }));
+    setExperience((prevExperience: any) => ({ ...prevExperience, [field]: value }));
   };
 
   const handleSkillsChange = (value: string) => {
@@ -27,7 +27,7 @@ const EditExperienceModal: React.FC<EditExperienceModalProps> = ({ experience, i
 
   useEffect(() => {
     if (experience) {
-      setEditedExperience({
+      setExperience({
         ...experience,
         skills: experience.skills.join(', ')
       });
@@ -35,11 +35,11 @@ const EditExperienceModal: React.FC<EditExperienceModalProps> = ({ experience, i
   }, [experience]);
 
   useEffect(() => {
-    const { title, date, skills, description } = editedExperience;
+    const { title, date, skills, description } = Experience;
     setIsButtonDisabled(
       !title || !date || !skills || !description
     );
-  }, [editedExperience]);
+  }, [Experience]);
 
   return (
     <div className="fixed inset-0 bg-zinc-500 bg-opacity-80 flex items-center justify-center">
@@ -51,44 +51,44 @@ const EditExperienceModal: React.FC<EditExperienceModalProps> = ({ experience, i
           <input
             type="text"
             placeholder="Título"
-            value={editedExperience.title}
+            value={Experience.title}
             onChange={(e) => handleExperienceChange("title", e.target.value)}
-            className="border border-dark_green p-3 mb-8 w-full rounded"
+            className="border border-dark_green p-3 mb-8 w-full rounded focus:outline-none "
           />
         </div>
         <div>
           <input
             type="text"
             placeholder="Período de atuação"
-            value={editedExperience.date}
+            value={Experience.date}
             onChange={(e) => handleExperienceChange("date", e.target.value)}
-            className="border border-dark_green p-3 mb-8 w-full rounded"
+            className="border border-dark_green p-3 mb-8 w-full rounded focus:outline-none"
           />
         </div>
         <div>
           <input
             type="text"
             placeholder="Habilidades (Separe-as por vírgula)"
-            value={editedExperience.skills}
+            value={Experience.skills}
             onChange={(e) => handleSkillsChange(e.target.value)}
-            className="border border-dark_green p-3 mb-8 w-full rounded"
+            className="border border-dark_green p-3 mb-8 w-full rounded focus:outline-none"
           />
         </div>
         <div>
           <textarea
             placeholder="Descreva sua experiência"
-            value={editedExperience.description}
+            value={Experience.description}
             onChange={(e) => handleExperienceChange("description", e.target.value)}
-            className="border border-dark_green p-3 pb-24 mb-8 w-full rounded"
+            className="border border-dark_green p-3 pb-24 mb-8 w-full rounded focus:outline-none"
           />
         </div>
         <div>
           <input
             type="text"
             placeholder="Link do repositório (Opcional)"
-            value={editedExperience.repositoryUrl}
+            value={Experience.repositoryUrl}
             onChange={(e) => handleExperienceChange("repositoryUrl", e.target.value)}
-            className="border border-dark_green p-3 mb-8 w-full rounded"
+            className="border border-dark_green p-3 mb-8 w-full rounded focus:outline-none"
           />
         </div>
         <div className="w-full flex justify-between">
@@ -99,7 +99,7 @@ const EditExperienceModal: React.FC<EditExperienceModalProps> = ({ experience, i
             Cancelar
           </button>
           <button
-            onClick={() => onSave({ ...editedExperience, skills: processSkills(editedExperience.skills) })}
+            onClick={() => onSave({ ...Experience, skills: processSkills(Experience.skills) })}
             className={`w-full py-2 ml-6 text-xl text-white rounded ${
               isButtonDisabled ? "bg-tertiary_text" : "bg-dark_green"
             }`}
@@ -113,4 +113,4 @@ const EditExperienceModal: React.FC<EditExperienceModalProps> = ({ experience, i
   );
 };
 
-export default EditExperienceModal;
+export default ExperienceModal;
