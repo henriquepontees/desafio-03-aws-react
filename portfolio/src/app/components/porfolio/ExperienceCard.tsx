@@ -66,7 +66,7 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({ experience, index, onCl
               href={experience.repositoryUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-auto text-secondary_text bg-dark_green font-semibold text-center p-2.5 rounded hover:bg-primary_color hover:text-white transition-colors"
+              className="mt-auto text-secondary_text bg-dark_green font-semibold text-center p-2.5 rounded hover:bg-primary_color transition-colors"
               style={{ fontSize: "24px" }}
             >
               Ver repositório

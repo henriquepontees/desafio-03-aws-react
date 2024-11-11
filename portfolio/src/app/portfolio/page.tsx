@@ -11,6 +11,7 @@ import NavHeader from "../components/porfolio/NavHeader";
 import useGithubAuth from "@/store/hooks/useGithubAuth";
 import { useSearchParams } from "next/navigation";
 
+
 interface UserData {
   name: string;
   avatarUrl: string;
@@ -181,11 +182,11 @@ const toggleEditMode = () => {
     <div className="flex min-h-screen items-center justify-center bg-background">
       <main className="w-full bg-secondary_text" id="inicio">
         <NavHeader />
-        <div className="flex justify-end w-full mt-24 pt-8 pr-16">
+        <div className="flex justify-end w-full mt-32 pt-8 pr-16">
         {currentUser &&  (
           <button
             onClick={toggleEditMode}
-            className="bg-card_color text-secondary_text rounded-full w-28 h-28 flex items-center justify-center"
+            className="bg-card_color text-secondary_text rounded-full w-28 h-28 flex items-center justify-center hover:bg-primary_color"
           >
             {isEditing ? <FaCheck size={55} /> : <FaPen size={55} />}
           </button>

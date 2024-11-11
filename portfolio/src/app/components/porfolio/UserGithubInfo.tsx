@@ -27,7 +27,6 @@ interface UserGithubInfoProps {
 const UserGithubInfo: React.FC<UserGithubInfoProps> = ({
   userData,
   isEditing,
-  openSocialMediaModal,
   setName,
   setLinkedln
 }) => {
@@ -116,7 +115,7 @@ const UserGithubInfo: React.FC<UserGithubInfoProps> = ({
               href={userData.profileUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-dark_green text-secondary_text rounded-xl text-lg flex items-center justify-center shadow-[8px_8px_0px_0px_rgba(9,188,138,1)]"
+              className="bg-dark_green text-secondary_text rounded-xl text-lg flex items-center justify-center hover:bg-primary_color shadow-[8px_8px_0px_0px_rgba(9,188,138,1)]"
               style={{
                 fontSize: "32px",
                 fontWeight: 600,
@@ -127,33 +126,35 @@ const UserGithubInfo: React.FC<UserGithubInfoProps> = ({
               GitHub
             </a>
           )}
-          <a
-            href={tempLinkedIn || undefined}
-            onClick={(e) => {
-              if (isEditing) {
-                e.preventDefault();
-                setIsModalOpen(true);
-              }
-            }}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-dark_green text-secondary_text rounded-xl text-lg flex items-center justify-center shadow-[8px_8px_0px_0px_rgba(9,188,138,1)]"
-            style={{
-              fontSize: "32px",
-              fontWeight: 600,
-              width: "270px",
-              height: "63px",
-              marginRight: "8px",
-              position: "relative",
-            }}
-          >
-            LinkedIn
-            {isEditing && (
-              <div className="absolute bottom-10 right-0 p-2 bg-card_color rounded-full">
-                <FaPen size={16} className="text-secondary_text" />
-              </div>
+          {(tempLinkedIn || isEditing) && (
+              <a
+                href={tempLinkedIn || undefined}
+                onClick={(e) => {
+                  if (isEditing) {
+                    e.preventDefault();
+                    setIsModalOpen(true);
+                  }
+                }}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-dark_green text-secondary_text rounded-xl text-lg flex items-center justify-center shadow-[8px_8px_0px_0px_rgba(9,188,138,1)]"
+                style={{
+                  fontSize: "32px",
+                  fontWeight: 600,
+                  width: "270px",
+                  height: "63px",
+                  marginRight: "8px",
+                  position: "relative",
+                }}
+              >
+                LinkedIn
+                {isEditing && (
+                  <div className="absolute bottom-10 right-0 p-2 bg-card_color rounded-full">
+                    <FaPen size={16} className="text-secondary_text" />
+                  </div>
+                )}
+              </a>
             )}
-          </a>
         </div>
         {isModalOpen && (
           <SocialMediaModal

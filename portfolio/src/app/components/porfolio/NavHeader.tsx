@@ -18,27 +18,30 @@ const NavHeader: React.FC = () => {
   return (
     <header className="bg-dark_green py-8 fixed w-full top-0 left-0 z-50 text-3xl border-b border-dark_green" style={{ borderBottomLeftRadius: '35px', borderBottomRightRadius: '35px' }}>
       <nav className="flex items-center justify-between px-40">
-        <div className="flex w-full justify-center space-x-40">
-          <a href="#inicio" className="text-secondary_text font-semibold hover:underline">
+        <div className="flex w-full justify-center space-x-40 ">
+          <a href="#inicio" className="text-secondary_text font-semibold hover:text-primary_color">
             Inicio
           </a>
-          <a href="#historia" className="text-secondary_text font-semibold hover:underline">
+          <a href="#historia" className="text-secondary_text font-semibold hover:text-primary_color">
             Historia
           </a>
-          <a href="#experiencias" className="text-secondary_text font-semibold hover:underline">
+          <a href="#experiencias" className="text-secondary_text font-semibold hover:text-primary_color">
             Experiencias
           </a>
-          <a href="#contato" className="text-secondary_text font-semibold hover:underline">
+          <a href="#contato" className="text-secondary_text font-semibold hover:text-primary_color">
             Contato
           </a>
         </div>
         {isAuthenticated ? (
-          <button
-            className="text-secondary_text bg-transparent hover:bg-secondary_text hover:text-dark_green transition-colors"
-            onClick={handleLogout}
-          >
-            Sair
-          </button>
+          <div className="flex items-center">
+            <button
+              className="text-secondary_text bg-transparent hover:text-primary_color transition-colors"
+              onClick={handleLogout}
+            >
+              Sair 
+            </button>
+            <div className="w-16 h-16 ml-2 bg-primary_color rounded-full"></div>
+          </div>
         ) : (
           <button
             className="flex items-center text-secondary_text bg-transparent hover:bg-secondary_text hover:text-dark_green transition-colors"

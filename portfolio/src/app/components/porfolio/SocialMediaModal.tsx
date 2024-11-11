@@ -35,13 +35,13 @@ const SocialMediaModal: React.FC<SocialMediaModalProps> = ({ socialMedia, onClos
           className="border border-dark_green p-3 mb-6 w-full rounded focus:outline-none"
         />
         <div className="w-full flex justify-between">
-          <button onClick={onClose} className="bg-secondary_text border-2 border-dark_green w-full py-2 text-xl text-primary_text rounded">
+          <button onClick={onClose} className="bg-secondary_text border-2 border-dark_green w-full py-2 text-xl text-primary_text rounded hover:bg-just_red hover:text-secondary_text">
             Cancelar
           </button>
           <button 
             onClick={handleSave} 
             className={`w-full py-2 ml-6 text-xl text-white rounded ${
-                isButtonDisabled ? "bg-tertiary_text" : "bg-dark_green"
+                isButtonDisabled ? "bg-tertiary_text" : "bg-dark_green hover:bg-primary_color"
               }`}
             disabled={isButtonDisabled}
           >

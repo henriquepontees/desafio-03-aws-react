@@ -5,7 +5,6 @@ import { IoIosWarning } from 'react-icons/io';
 import { useRouter } from 'next/navigation';
 import Dropdown from './components/login/DropDown';
 import GitHubLoginButton from './components/login/GitHubLoginButton';
-import useGithubAuth from '@/store/hooks/useGithubAuth';
 
 interface User {
   id: number,
@@ -110,7 +109,7 @@ const Login = () => {
             />
             <button
               type="submit"
-              className={`flex items-center justify-center px-4 py-2 border border-gray-900 rounded-2xl text-secondary_text ${isButtonDisabled ? 'bg-tertiary_text cursor-not-allowed' : 'bg-secondary_color'}`}
+              className={`flex items-center justify-center px-4 py-2 border border-gray-900 rounded-2xl text-secondary_text  ${isButtonDisabled ? 'bg-tertiary_text cursor-not-allowed' : 'bg-secondary_color hover:bg-primary_color'}`}
               style={{ height: '56px', width: '83px', marginLeft: '17.2px' }}
               disabled={isButtonDisabled}
               onClick={handleSearch}
