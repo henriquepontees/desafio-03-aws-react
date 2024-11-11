@@ -8,31 +8,29 @@ import GitHubLoginButton from './components/login/GitHubLoginButton';
 import useGithubAuth from '@/store/hooks/useGithubAuth';
 
 interface User {
+  id: number,
   name: string;
   avatarUrl: string;
-  id: any;
-  profile_url: string;
+  profileUrl: string;
   userName: string;
   location: string;
   email: string;
   bio: string;
 }
 
-const Login = () => {
-  const { githubSignUp } = useGithubAuth();
+const Login = () => { 
   const router = useRouter();
   const [username, setUsername] = useState<string>('');
   const [users, setUsers] = useState<User[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    const storedUsers = localStorage.getItem('githubUser');
-    console.log('Dados obtidos do localStorage:', storedUsers); console.log(storedUsers)
+    const storedUsers = localStorage.getItem('githubUsers');
+    console.log('Dados obtidos do localStorage:', storedUsers);
   
     if (storedUsers) {
       try {
         const parsedData = JSON.parse(storedUsers);
-        console.log('Dados parseados:', parsedData);
         const formattedUsers = Array.isArray(parsedData)
           ? parsedData.map((user: any) => ({
               id: user.id,
@@ -41,7 +39,7 @@ const Login = () => {
               location: user.location,
               email: user.email,
               bio: user.bio,
-              profile_url: user.profileUrl,
+              profileUrl: user.profileUrl,
               userName: user.userName || '',
             }))
           : [{
@@ -51,7 +49,7 @@ const Login = () => {
               location: parsedData.location,
               email: parsedData.email,
               bio: parsedData.bio,
-              profile_url: parsedData.profileUrl,
+              profileUrl: parsedData.profileUrl,
               userName: parsedData.userName || '',
             }];
         setUsers(formattedUsers);
@@ -60,7 +58,6 @@ const Login = () => {
       }
     }
   }, []);
-  
   
   const handleDropdownItemClick = useCallback((user: User) => {
     localStorage.setItem('githubUser', JSON.stringify(user));

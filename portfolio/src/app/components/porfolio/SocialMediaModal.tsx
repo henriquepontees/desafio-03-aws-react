@@ -32,7 +32,7 @@ const SocialMediaModal: React.FC<SocialMediaModalProps> = ({ socialMedia, onClos
           placeholder="Digite a URL"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
-          className="border p-3 mb-6 w-full rounded focus:outline-none"
+          className="border border-dark_green p-3 mb-6 w-full rounded focus:outline-none"
         />
         <div className="w-full flex justify-between">
           <button onClick={onClose} className="bg-secondary_text border-2 border-dark_green w-full py-2 text-xl text-primary_text rounded">

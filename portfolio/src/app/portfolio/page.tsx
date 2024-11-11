@@ -1,17 +1,29 @@
-"use client"
+"use client";
 import { useEffect, useState } from "react";
 import { FaPen, FaCheck } from "react-icons/fa";
 import ExperienceCard from "../components/porfolio/ExperienceCard";
 import ExperienceModal from "../components/porfolio/ExperienceModal";
 import UserGithubInfo from "../components/porfolio/UserGithubInfo";
 import NewExperienceCard from "../components/porfolio/NewExperienceCard";
-import { FaInstagram, FaFacebook, FaTwitter, FaYoutube } from "react-icons/fa";
 import SocialMediaModal from "../components/porfolio/SocialMediaModal";
 import Footer from "../components/porfolio/Footer";
 import NavHeader from "../components/porfolio/NavHeader";
+import useGithubAuth from "@/store/hooks/useGithubAuth";
+import { useSearchParams } from "next/navigation";
+
+interface UserData {
+  name: string;
+  avatarUrl: string;
+  id: any;
+  profileUrl: string;
+  userName: string;
+  location: string;
+  email: string;
+  bio: string;
+}
 
 export default function Portfolio() {
-  const [userData, setUserData] = useState<any>(null);
+  const { currentUser } = useGithubAuth();
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [experienceData, setExperienceData] = useState<any[]>([]);
   const [tempExperienceData, setTempExperienceData] = useState<any[]>([]);
@@ -31,41 +43,49 @@ export default function Portfolio() {
   const [showSocialModal, setShowSocialModal] = useState(false);
   const [selectedSocialMedia, setSelectedSocialMedia] = useState<any>(null);
   const [tempSocialMediaLinks, setTempSocialMediaLinks] = useState(socialMediaLinks);
+  const searchParams = useSearchParams();
+  const userId = searchParams.get('userId');
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [name, setName] = useState<string>("");
+  const [linkedln, setLinkedln] = useState<string>("");
+  
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("githubUser");
-    if (storedUser) {
-      setUserData(JSON.parse(storedUser));
+    if (userId) {
+      const storedUsers = JSON.parse(localStorage.getItem('githubUsers') || '[]');
+      const user = storedUsers.find((user: UserData) => user.id === Number(userId));
+      setUserData(user || null);
+    } else if (currentUser) {
+      setUserData(currentUser);
     }
-
-    const storedExperienceData = localStorage.getItem("experienceData");
-    if (storedExperienceData) {
-      setExperienceData(JSON.parse(storedExperienceData));
-    }
-
-    const storedBioText = localStorage.getItem("bioText") || "";
-    const storedEmailText = localStorage.getItem("emailText") || "";
-    setBioText(storedBioText);
-    setEmailText(storedEmailText);
-
-    const storedSocialMediaLinks = localStorage.getItem("socialMediaLinks");
-    if (storedSocialMediaLinks) {
-      setSocialMediaLinks(JSON.parse(storedSocialMediaLinks));
-    }
-
-  }, []);
+  }, [userId, currentUser]);
 
   useEffect(() => {
-    const storedBioText = localStorage.getItem("bioText") || "";
-    const storedEmailText = localStorage.getItem("emailText") || "";
-    setBioText(storedBioText);
-    setEmailText(storedEmailText);
+    if (userData) {
+      setName(userData.name);
+    }
+  }, [userData]);
 
-    // Inicializa os estados temporários com os valores salvos
-    setTempBioText(storedBioText);
-    setTempEmailText(storedEmailText);
-  }, []);
+  useEffect(() => {
+    if (userData) {
+      const userIdPrefix = `user_${userData.id}`;
 
+      const storedExperienceData = localStorage.getItem(`${userIdPrefix}_experienceData`);
+      if (storedExperienceData) {
+        setExperienceData(JSON.parse(storedExperienceData));
+      }
+
+      const storedBioText = localStorage.getItem(`${userIdPrefix}_bioText`) || "";
+      const storedEmailText = localStorage.getItem(`${userIdPrefix}_emailText`) || "";
+      setBioText(storedBioText);
+      setEmailText(storedEmailText);
+
+      const storedSocialMediaLinks = localStorage.getItem(`${userIdPrefix}_socialMediaLinks`);
+      if (storedSocialMediaLinks) {
+        setSocialMediaLinks(JSON.parse(storedSocialMediaLinks));
+      }
+    }
+  }, [userData]);
 
   useEffect(() => {
     if (isEditing) {
@@ -73,24 +93,32 @@ export default function Portfolio() {
     }
   }, [isEditing]);
 
-  useEffect(() => {
-    localStorage.setItem("experienceData", JSON.stringify(experienceData));
-    localStorage.setItem("bioText", bioText);
-    localStorage.setItem("emailText", emailText);
-    localStorage.setItem("socialMediaLinks", JSON.stringify(socialMediaLinks));
-  }, [experienceData, bioText, emailText, socialMediaLinks ]);
 
-  const toggleEditMode = () => {
-    if (isEditing) {
-      setExperienceData(tempExperienceData);
-      setSocialMediaLinks(tempSocialMediaLinks);
-      setBioText(tempBioText);
-      setEmailText(tempEmailText);
-      localStorage.setItem("bioText", tempBioText);
-      localStorage.setItem("emailText", tempEmailText);
+const toggleEditMode = () => {
+  if (isEditing) {
+    setExperienceData(tempExperienceData);
+    setSocialMediaLinks(tempSocialMediaLinks);
+    setBioText(tempBioText);
+    setEmailText(tempEmailText);
+
+    if (userData) {
+      const userIdPrefix = `user_${userData.id}`;
+      localStorage.setItem(`${userIdPrefix}_experienceData`, JSON.stringify(tempExperienceData));
+      localStorage.setItem(`${userIdPrefix}_socialMediaLinks`, JSON.stringify(tempSocialMediaLinks));
+      localStorage.setItem(`${userIdPrefix}_bioText`, tempBioText);
+      localStorage.setItem(`${userIdPrefix}_emailText`, tempEmailText);
+
     }
-    setIsEditing(!isEditing);
-  };
+  } else {
+    setTempExperienceData([...experienceData]);
+    setTempSocialMediaLinks([...socialMediaLinks]);
+    setTempBioText(bioText);
+    setTempEmailText(emailText);
+  }
+
+  setIsEditing(!isEditing);
+};
+  
 
   const handleModalSave = (updatedExperience: any) => {
     if (isAddingNewExperience) {
@@ -132,11 +160,10 @@ export default function Portfolio() {
     }
   };
 
-  const openSocialMediaModal = (socialMedia: any) => {
+  const openSocialMediaModal = (socialMedia: { platform: string; url: string }) => {
     setSelectedSocialMedia(socialMedia);
     setShowSocialModal(true);
   };
-
   const handleSaveSocialMedia = (updatedSocialMedia: any) => {
     if (isEditing) {
       setTempSocialMediaLinks((prevLinks) =>
@@ -148,21 +175,32 @@ export default function Portfolio() {
     setShowSocialModal(false);
   };
 
-  if (!userData) return <div>LOADING QUE VOU COLOCAR AINDA</div>;
+  if (!userData) return <div>LOADING...</div>;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
-      <main className="w-full bg-secondary_text">
-      <NavHeader />
+      <main className="w-full bg-secondary_text" id="inicio">
+        <NavHeader />
         <div className="flex justify-end w-full mt-24 pt-8 pr-16">
+        {currentUser &&  (
           <button
             onClick={toggleEditMode}
             className="bg-card_color text-secondary_text rounded-full w-28 h-28 flex items-center justify-center"
           >
             {isEditing ? <FaCheck size={55} /> : <FaPen size={55} />}
           </button>
+        )}
         </div>
-        <UserGithubInfo userData={userData} />
+
+        <UserGithubInfo
+          key={userData.userName}
+          userData={{ ...userData, name }}
+          isEditing={isEditing}
+          setName={setName}
+          setLinkedln={setLinkedln}
+          openSocialMediaModal={openSocialMediaModal}
+        />
+
         <section className="my-32 p-16 bg-card_color rounded-lg mx-16">
           <h2 className="text-left font-bold text-secondary_text mb-16" style={{ fontSize: "64px" }}>
             Minha História
