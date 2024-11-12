@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📚 Projeto de Aprendizado - Portfólio com Next.js e TypeScript
 
-## Getting Started
+Este projeto foi uma jornada de aprendizado (e muito!) em que explorei Next.js e TypeScript para construir uma aplicação usando o arquivo `app/page.tsx`. 🎉
 
-First, run the development server:
+## 🚀 Tecnologias Utilizadas
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Next.js**: Framework React poderoso para construção de interfaces modernas e otimizadas.
+- **TypeScript**: Para adicionar segurança de tipos e melhorar a escalabilidade do projeto.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🎨 Estrutura do Projeto
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+O projeto foi estruturado para aproveitar ao máximo o sistema de rotas do Next.js e o poder do TypeScript. O arquivo principal editado foi o `app/page.tsx`, onde as funcionalidades e componentes do portfólio são gerenciados.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ⚙️ Como Rodar o Projeto
 
-## Learn More
+Para rodar o projeto localmente, siga os passos abaixo:
 
-To learn more about Next.js, take a look at the following resources:
+1. Clone o repositório e navegue até a pasta do projeto:
+    ```bash
+    cd portfolio
+    ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. Instale as dependências:
+    ```bash
+    npm install
+    ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. Inicie o servidor de desenvolvimento:
+    ```bash
+    npm run dev
+    ```
 
-## Deploy on Vercel
+4. Abra [http://localhost:3000](http://localhost:3000) no navegador para ver o resultado!
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📖 O que Aprendi
+
+Durante esse projeto, tive a oportunidade de aprender e aplicar:
+
+- **Componentização**: Como organizar componentes para facilitar a reutilização.
+- **Rotas no Next.js**: Estruturação das páginas usando a convenção de rotas.
+- **TypeScript no Frontend**: Especificação de tipos, interfaces e uso de props tipadas.
+- **Otimização com Next.js**: Carregamento otimizado e prática de boas práticas de performance.
+
+
+---
+
+📌 **Observação**: Esse projeto é apenas uma demonstração das habilidades e do aprendizado durante o desenvolvimento com Next.js e TypeScript. 
+
+---
+
+**Feito por Henrique Pontes**
