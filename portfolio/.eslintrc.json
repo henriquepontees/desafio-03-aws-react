@@ -4,13 +4,8 @@
     "next/typescript",
     "plugin:@typescript-eslint/recommended"
   ],
-  "plugins": ["@typescript-eslint", "postcss"],
+  "plugins": ["@typescript-eslint"],
   "rules": {
-    "postcss/no-unknown-at-rules": [
-      "error",
-      {
-        "ignoreAtRules": ["apply", "tailwind", "layer", "screen"]
-      }
-    ]
+
   }
 }
