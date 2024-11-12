@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { FaPen, FaTrashAlt } from "react-icons/fa";
-import { Experience } from "@/store/types";
 
 
 interface ExperienceCardProps {
