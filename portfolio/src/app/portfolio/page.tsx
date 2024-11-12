@@ -1,137 +1,102 @@
-"use client";
-import { useEffect, useState } from "react";
+
+"use client"
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { FaPen, FaCheck } from "react-icons/fa";
-import ExperienceCard from "../components/porfolio/ExperienceCard";
-import ExperienceModal from "../components/porfolio/ExperienceModal";
-import UserGithubInfo from "../components/porfolio/UserGithubInfo";
-import NewExperienceCard from "../components/porfolio/NewExperienceCard";
-import SocialMediaModal from "../components/porfolio/SocialMediaModal";
-import Footer from "../components/porfolio/Footer";
-import NavHeader from "../components/porfolio/NavHeader";
-import useGithubAuth from "@/store/hooks/useGithubAuth";
-import { useSearchParams } from "next/navigation";
+import useGithubAuth from '@/store/hooks/useGithubAuth';
+import useLocalStorage from '@/store/hooks/useLocalStorage';
+import NavHeader from '../components/portfolio/NavHeader';
+import SocialMediaModal from '../components/portfolio/SocialMediaModal';
+import Footer from '../components/portfolio/Footer';
+import { SocialMediaLink, UserData, Experience } from "@/store/types";
+import ExperienceSection from '../components/portfolio/ExperienceSection';
 
-
-interface UserData {
-  name: string;
-  avatarUrl: string;
-  id: any;
-  profileUrl: string;
-  userName: string;
-  location: string;
-  email: string;
-  bio: string;
-}
-
-export default function Portfolio() {
-  const { currentUser } = useGithubAuth();
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [experienceData, setExperienceData] = useState<any[]>([]);
-  const [tempExperienceData, setTempExperienceData] = useState<any[]>([]);
-  const [showModal, setShowModal] = useState(false);
-  const [selectedExperience, setSelectedExperience] = useState<any>(null);
-  const [isAddingNewExperience, setIsAddingNewExperience] = useState(false);
-  const [bioText, setBioText] = useState<string>("");
-  const [emailText, setEmailText] = useState<string>("");
-  const [tempBioText, setTempBioText] = useState<string>("");
-  const [tempEmailText, setTempEmailText] = useState<string>("");
-  const [socialMediaLinks, setSocialMediaLinks] = useState([
-    { platform: "Instagram", url: "" },
-    { platform: "Facebook", url: "" },
-    { platform: "Twitter", url: "" },
-    { platform: "YouTube", url: "" },
-  ]);
-  const [showSocialModal, setShowSocialModal] = useState(false);
-  const [selectedSocialMedia, setSelectedSocialMedia] = useState<any>(null);
-  const [tempSocialMediaLinks, setTempSocialMediaLinks] = useState(socialMediaLinks);
-  const searchParams = useSearchParams();
-  const userId = searchParams.get('userId');
+export default function Home() {
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [name, setName] = useState<string>("");
-  const [linkedln, setLinkedln] = useState<string>("");
-  
+  const { isAuthenticated } = useGithubAuth();
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [myHistory, setMyHistory, updateObjectInLocalStorage] = useLocalStorage<string>('myHistory', '');
+  const [myLinkedln, setMyLinkedln] = useLocalStorage<string>('myLinkedln', '');
+  const [myInstagram, setMyInstagram] = useLocalStorage<string>('myInstagram', '');
+  const [myFacebook, setMyFacebook] = useLocalStorage<string>('myFacebook', '');
+  const [myTwitter, setMyTwitter] = useLocalStorage<string>('myTwitter', '');
+  const [myYoutube, setMyYoutube] = useLocalStorage<string>('myYoutube', '');
+  const [myEmailText, setMyEmailText] = useLocalStorage<string>('myEmailText', '');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedSocialMedia, setSelectedSocialMedia] = useState<SocialMediaLink | null>(null);
+  const [experienceData, setExperienceData] = useState<Experience[]>([]);
+  const [tempExperienceData, setTempExperienceData] = useState<Experience[]>([]); 
+  const [selectedExperience, setSelectedExperience] = useState<Experience | null>(null); 
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [isAddingNewExperience, setIsAddingNewExperience] = useState<boolean>(false)
 
   useEffect(() => {
-    if (userId) {
-      const storedUsers = JSON.parse(localStorage.getItem('githubUsers') || '[]');
-      const user = storedUsers.find((user: UserData) => user.id === Number(userId));
-      setUserData(user || null);
-    } else if (currentUser) {
-      setUserData(currentUser);
+    const storedUser = localStorage.getItem('githubUser') || localStorage.getItem('selectedUser');
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      setUserData(user);
+      setMyHistory(user.myHistory || '');
+      setMyLinkedln(user.myLinkedln || '');
+      setMyInstagram(user.myInstagram || '');
+      setMyFacebook(user.myFacebook || "");
+      setMyTwitter(user.myTwitter || "");
+      setMyYoutube(user.myYoutube || "");
+      setMyEmailText(user.myEmailText || "");
+      setExperienceData(user.experienceData || "")
     }
-  }, [userId, currentUser]);
+  }, [setMyHistory, setMyLinkedln, setMyInstagram, setMyFacebook, setMyTwitter, setMyYoutube, setMyEmailText, setExperienceData]);
 
-  useEffect(() => {
+  const handleSave = () => {
     if (userData) {
-      setName(userData.name);
+      const updatedUserData = { ...userData, myHistory, myLinkedln, myInstagram, myFacebook, myTwitter, myYoutube, myEmailText, experienceData };
+
+      localStorage.setItem('selectedUser', JSON.stringify(updatedUserData));
+      localStorage.setItem('githubUser', JSON.stringify(updatedUserData));
+
+      updateObjectInLocalStorage('unauthUsers', updatedUserData);
+      updateObjectInLocalStorage('githubUsers', updatedUserData);
+
+      setUserData(updatedUserData);
     }
-  }, [userData]);
 
-  useEffect(() => {
-    if (userData) {
-      const userIdPrefix = `user_${userData.id}`;
+    
+  };
 
-      const storedExperienceData = localStorage.getItem(`${userIdPrefix}_experienceData`);
-      if (storedExperienceData) {
-        setExperienceData(JSON.parse(storedExperienceData));
-      }
+  const toggleEditMode = () => {
+    if (isEditing) handleSave();
+    setIsEditing(!isEditing);
+  };
 
-      const storedBioText = localStorage.getItem(`${userIdPrefix}_bioText`) || "";
-      const storedEmailText = localStorage.getItem(`${userIdPrefix}_emailText`) || "";
-      setBioText(storedBioText);
-      setEmailText(storedEmailText);
-
-      const storedSocialMediaLinks = localStorage.getItem(`${userIdPrefix}_socialMediaLinks`);
-      if (storedSocialMediaLinks) {
-        setSocialMediaLinks(JSON.parse(storedSocialMediaLinks));
-      }
-    }
-  }, [userData]);
-
-  useEffect(() => {
+  const handleOpenSocialMediaModal = (socialMedia: SocialMediaLink) => {
     if (isEditing) {
-      setTempExperienceData([...experienceData]);
+      setSelectedSocialMedia(socialMedia);
+      setIsModalOpen(true);
     }
-  }, [isEditing]);
+  };
 
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedSocialMedia(null);
+  };
 
-const toggleEditMode = () => {
-  if (isEditing) {
-    setExperienceData(tempExperienceData);
-    setSocialMediaLinks(tempSocialMediaLinks);
-    setBioText(tempBioText);
-    setEmailText(tempEmailText);
-
-    if (userData) {
-      const userIdPrefix = `user_${userData.id}`;
-      localStorage.setItem(`${userIdPrefix}_experienceData`, JSON.stringify(tempExperienceData));
-      localStorage.setItem(`${userIdPrefix}_socialMediaLinks`, JSON.stringify(tempSocialMediaLinks));
-      localStorage.setItem(`${userIdPrefix}_bioText`, tempBioText);
-      localStorage.setItem(`${userIdPrefix}_emailText`, tempEmailText);
-
+  const handleSaveSocialMedia = (updatedSocialMedia: SocialMediaLink) => {
+    switch (updatedSocialMedia.key) {
+      case "instagram":
+        setMyInstagram(updatedSocialMedia.url); 
+        break;
+      case "facebook":
+        setMyFacebook(updatedSocialMedia.url);
+        break;
+      case "twitter":
+        setMyTwitter(updatedSocialMedia.url);
+        break;
+      case "youtube":
+        setMyYoutube(updatedSocialMedia.url);
+        break;
+      default:
+        break;
     }
-  } else {
-    setTempExperienceData([...experienceData]);
-    setTempSocialMediaLinks([...socialMediaLinks]);
-    setTempBioText(bioText);
-    setTempEmailText(emailText);
-  }
-
-  setIsEditing(!isEditing);
-};
-  
-
-  const handleModalSave = (updatedExperience: any) => {
-    if (isAddingNewExperience) {
-      setTempExperienceData([...tempExperienceData, updatedExperience]);
-    } else {
-      const updatedExperienceData = tempExperienceData.map((exp) =>
-        exp.title === updatedExperience.title ? updatedExperience : exp
-      );
-      setTempExperienceData(updatedExperienceData);
-    }
-    setShowModal(false);
-    setIsAddingNewExperience(false);
+    handleCloseModal();
   };
 
   const openModal = (experience: any) => {
@@ -161,46 +126,90 @@ const toggleEditMode = () => {
     }
   };
 
-  const openSocialMediaModal = (socialMedia: { platform: string; url: string }) => {
-    setSelectedSocialMedia(socialMedia);
-    setShowSocialModal(true);
-  };
-  const handleSaveSocialMedia = (updatedSocialMedia: any) => {
-    if (isEditing) {
-      setTempSocialMediaLinks((prevLinks) =>
-        prevLinks.map((link) =>
-          link.platform === updatedSocialMedia.platform ? updatedSocialMedia : link
-        )
-      );
-    }
-    setShowSocialModal(false);
-  };
-
-  if (!userData) return <div>LOADING...</div>;
+  if (!userData) return <div>Carregando...</div>;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
       <main className="w-full bg-secondary_text" id="inicio">
         <NavHeader />
+
         <div className="flex justify-end w-full mt-32 pt-8 pr-16">
-        {currentUser &&  (
-          <button
-            onClick={toggleEditMode}
-            className="bg-card_color text-secondary_text rounded-full w-28 h-28 flex items-center justify-center hover:bg-primary_color"
-          >
-            {isEditing ? <FaCheck size={55} /> : <FaPen size={55} />}
-          </button>
-        )}
+          {isAuthenticated && (
+            <button
+              onClick={toggleEditMode}
+              className="bg-card_color text-secondary_text rounded-full w-28 h-28 flex items-center justify-center hover:bg-primary_color"
+            >
+              {isEditing ? <FaCheck size={55} /> : <FaPen size={55} />}
+            </button>
+          )}
         </div>
 
-        <UserGithubInfo
-          key={userData.userName}
-          userData={{ ...userData, name }}
-          isEditing={isEditing}
-          setName={setName}
-          setLinkedln={setLinkedln}
-          openSocialMediaModal={openSocialMediaModal}
-        />
+        <section className="grid grid-cols-4 gap-8 w-full px-16">
+          <div className="col-span-1 flex flex-col items-center space-y-4">
+            {userData.avatar_url && (
+              <div className="w-72 h-72 rounded-full overflow-hidden">
+                <Image
+                  className="object-cover"
+                  src={userData.avatar_url}
+                  alt={`Avatar de ${userData.name}`}
+                  width={288}
+                  height={288}
+                />
+              </div>
+            )}
+            <p className="text-primary_text text-4xl w-full break-words py-5 truncate" style={{ textAlign: "center", fontSize: "64px", fontWeight: 600, maxWidth: "100%" }}>
+              {userData.userName}
+            </p>
+            <p className="text-sm text-gray-500 text-primary_text" style={{ fontSize: "25px", fontWeight: 500 }}>
+              {userData.location}
+            </p>
+            <p className="text-sm text-gray-500 text-primary_text" style={{ fontSize: "25px", fontWeight: 500 }}>
+              {userData.email}
+            </p>
+          </div>
+
+          <div className="col-span-3 flex flex-col items-end space-y-6" style={{ width: "500px", marginLeft: "auto" }}>
+            <h1 className="font-bold text-primary_text text-left" style={{ fontSize: "64px", lineHeight: "130%" }}>
+              Hello, <br /> I&apos;m {userData.name}
+            </h1>
+            <p className="text-lg text-primary_text text-left" style={{ fontSize: "25px", fontWeight: 600, maxHeight: "10rem" }}>
+              {userData.bio}
+            </p>
+            <div className="flex space-x-4 relative">
+              {userData.profileUrl && (
+                <a
+                  href={userData.profileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-dark_green text-secondary_text rounded-xl text-lg flex items-center justify-center hover:bg-primary_color shadow-[8px_8px_0px_0px_rgba(9,188,138,1)]"
+                  style={{ fontSize: "32px", fontWeight: 600, width: "194px", height: "63px" }}
+                >
+                  GitHub
+                </a>
+              )}
+                <a
+                  href={!isEditing ? myLinkedln || "#" : undefined} 
+                  onClick={(e) => {
+                    if (isEditing) {
+                      e.preventDefault();
+                      handleOpenSocialMediaModal({ platform: 'LinkedIn', url: myLinkedln || '', key: 'linkedin' });
+                    }
+                  }}
+                  className="bg-dark_green text-secondary_text rounded-xl text-lg flex items-center justify-center relative"
+                  style={{ fontSize: "32px", fontWeight: 600, width: "270px", height: "63px", marginRight: "8px" }}
+                  target={!isEditing ? "_blank" : undefined}
+                  rel="noopener noreferrer"
+                >
+                  LinkedIn
+                  {isEditing && (
+                    <div className="absolute top-0 right-0 bg-card_color rounded-full p-1">
+                      <FaPen size={16} className="text-secondary_text" />
+                    </div>
+                  )}
+                </a>
+            </div>
+          </div>
+        </section>
 
         <section className="my-32 p-16 bg-card_color rounded-lg mx-16">
           <h2 className="text-left font-bold text-secondary_text mb-16" style={{ fontSize: "64px" }}>
@@ -208,15 +217,15 @@ const toggleEditMode = () => {
           </h2>
           {isEditing ? (
             <textarea
-              value={tempBioText}
+              value={myHistory}
               placeholder="adicione sua história"
-              onChange={(e) => setTempBioText(e.target.value)}
+              onChange={(e) => setMyHistory(e.target.value)}
               className="w-full p-4 text-secondary_text font-semibold bg-transparent focus:outline-none"
               style={{ fontSize: "24px" }}
             />
-          ) : bioText ? (
+          ) : myHistory ? (
             <p className="text-secondary_text text-lg font-semibold" style={{ fontSize: "24px" }}>
-              {bioText}
+              {myHistory}
             </p>
           ) : (
             <p className="text-secondary_text text-lg font-semibold" style={{ fontSize: "24px" }}>
@@ -224,39 +233,8 @@ const toggleEditMode = () => {
             </p>
           )}
         </section>
-
-        <section className="mt-32 p-16 bg-secondary_color">
-          <h2 className="text-center text-4xl font-bold text-secondary_text pb-16" style={{ fontSize: "64px" }}>
-            Experiências
-          </h2>
-
-          {experienceData.length === 0 && !isEditing ? (
-            <p className="text-center text-tertiary_text " style={{ fontSize: "40px", fontWeight:400 }}>
-              Não há nada por aqui!
-            </p>
-          ) : (
-            <div className="grid grid-cols-2 gap-8">
-              {(isEditing ? tempExperienceData : experienceData).map((exp, index) => (
-                <ExperienceCard
-                  key={index}
-                  experience={exp}
-                  index={index}
-                  onClick={() => openModal(exp)}
-                  onDelete={() => handleDeleteExperience(index)}
-                  isEditing={isEditing}
-                />
-              ))}
-              {isEditing && (
-                <NewExperienceCard 
-                  onClick={openAddNewCardModal} 
-                  experienceDataLength={experienceData.length}
-                  tempExperienceDataLength={tempExperienceData.length}
-                />
-              )}
-            </div>
-          )}
-        </section>
-        {isEditing || emailText ? (
+        <ExperienceSection isEditing={isEditing} />
+        {isEditing || myEmailText ? (
           <section className="text-center font-bold text-secondary_text p-16 bg-dark_green">
             <h2 className="my-16" style={{ fontSize: "42px" }}>
               Sinta-se livre para me contatar a qualquer momento!
@@ -264,42 +242,40 @@ const toggleEditMode = () => {
             {isEditing ? (
               <input
                 type="text"
-                value={tempEmailText}
+                value={myEmailText}
                 placeholder="adicione um email adicional"
-                onChange={(e) => setTempEmailText(e.target.value)}
+                onChange={(e) => setMyEmailText(e.target.value)}
                 className="text-center w-full bg-transparent focus:outline-none"
                 style={{ fontSize: "64px" }}
               />
             ) : (
               <p className="mb-20" style={{ fontSize: "64px" }}>
-                {emailText}
+                {myEmailText}
               </p>
             )}
           </section>
         ) : null}
+
         <Footer
-          isEditing={isEditing}
-          socialMediaLinks={socialMediaLinks}
-          openSocialMediaModal={openSocialMediaModal}
-        />
-      </main>
-      
-      {showSocialModal && selectedSocialMedia && (
+        isEditing={isEditing}
+        socialMediaLinks={[
+          { platform: "Instagram", url: myInstagram, key: "instagram" },
+          { platform: "Facebook", url: myFacebook, key: "facebook" },
+          { platform: "Twitter", url: myTwitter, key: "twitter" },
+          { platform: "Youtube", url: myYoutube, key: "youtube" },
+        ]}
+        openSocialMediaModal={handleOpenSocialMediaModal}
+      />
+
+        {isModalOpen && selectedSocialMedia && (
           <SocialMediaModal
             socialMedia={selectedSocialMedia}
-            onClose={() => setShowSocialModal(false)}
+            isOpen={isModalOpen}
+            onClose={handleCloseModal}
             onSave={handleSaveSocialMedia}
           />
         )}
-
-        {showModal && (
-          <ExperienceModal
-            isCreating={isAddingNewExperience}
-            experience={selectedExperience}
-            onClose={() => setShowModal(false)}
-            onSave={handleModalSave}
-          />
-        )}
+      </main>
     </div>
   );
 }

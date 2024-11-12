@@ -1,68 +1,52 @@
-"use client";
+"use client"
 import { useState, useEffect, useMemo, useCallback, ChangeEvent } from 'react';
 import { FaArrowRight } from 'react-icons/fa';
 import { IoIosWarning } from 'react-icons/io';
 import { useRouter } from 'next/navigation';
 import Dropdown from './components/login/DropDown';
 import GitHubLoginButton from './components/login/GitHubLoginButton';
+import { User, UnauthUser } from '@/store/types';
 
-interface User {
-  id: number,
-  name: string;
-  avatarUrl: string;
-  profileUrl: string;
-  userName: string;
-  location: string;
-  email: string;
-  bio: string;
-}
-
-const Login = () => { 
+const Login = () => {
   const router = useRouter();
   const [username, setUsername] = useState<string>('');
   const [users, setUsers] = useState<User[]>([]);
+  const [unauthUsers, setUnauthUsers] = useState<UnauthUser[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const storedUsers = localStorage.getItem('githubUsers');
-    console.log('Dados obtidos do localStorage:', storedUsers);
-  
     if (storedUsers) {
       try {
-        const parsedData = JSON.parse(storedUsers);
-        const formattedUsers = Array.isArray(parsedData)
-          ? parsedData.map((user: any) => ({
-              id: user.id,
-              name: user.name || user.userName,
-              avatarUrl: user.avatarUrl,
-              location: user.location,
-              email: user.email,
-              bio: user.bio,
-              profileUrl: user.profileUrl,
-              userName: user.userName || '',
-            }))
-          : [{
-              id: parsedData.id,
-              name: parsedData.name || parsedData.userName,
-              avatarUrl: parsedData.avatarUrl,
-              location: parsedData.location,
-              email: parsedData.email,
-              bio: parsedData.bio,
-              profileUrl: parsedData.profileUrl,
-              userName: parsedData.userName || '',
-            }];
-        setUsers(formattedUsers);
+        const parsedUsers = JSON.parse(storedUsers);
+        if (Array.isArray(parsedUsers)) {
+          setUsers(parsedUsers);
+        }
       } catch (error) {
         console.error('Erro ao parsear dados do Local Storage:', error);
       }
     }
   }, []);
+
+  useEffect(() => {
+    const storedUnauthUsers = localStorage.getItem('unauthUsers');
+    if (storedUnauthUsers) {
+      try {
+        const parsedUnauthUsers = JSON.parse(storedUnauthUsers);
+        if (Array.isArray(parsedUnauthUsers)) {
+          setUnauthUsers(parsedUnauthUsers);
+        }
+      } catch (error) {
+        console.error('Erro ao parsear dados de usuários não autenticados:', error);
+      }
+    }
+  }, []);
   
-  const handleDropdownItemClick = useCallback((user: User) => {
-    localStorage.setItem('githubUser', JSON.stringify(user));
+
+  const handleDropdownItemClick = useCallback((user: UnauthUser) => {
+    localStorage.setItem('selectedUser', JSON.stringify(user));
     console.log('Usuário selecionado no Dropdown:', user);
-    router.push('/portfolio');
-  }, [router]);
+}, [router]);
 
   const filteredUsers = useMemo(() => {
     if (username.trim()) {
@@ -109,7 +93,7 @@ const Login = () => {
             />
             <button
               type="submit"
-              className={`flex items-center justify-center px-4 py-2 border border-gray-900 rounded-2xl text-secondary_text  ${isButtonDisabled ? 'bg-tertiary_text cursor-not-allowed' : 'bg-secondary_color hover:bg-primary_color'}`}
+              className={`flex items-center justify-center px-4 py-2 border border-gray-900 rounded-2xl text-secondary_text ${isButtonDisabled ? 'bg-tertiary_text cursor-not-allowed' : 'bg-secondary_color'}`}
               style={{ height: '56px', width: '83px', marginLeft: '17.2px' }}
               disabled={isButtonDisabled}
               onClick={handleSearch}
