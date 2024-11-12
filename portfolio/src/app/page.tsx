@@ -3,20 +3,15 @@ import { useState, useEffect, useMemo, useCallback, ChangeEvent } from 'react';
 import { FaArrowRight } from 'react-icons/fa';
 import { IoIosWarning } from 'react-icons/io';
 import { useRouter } from 'next/navigation';
-import Dropdown from './components/DropDown';
-import GitHubLoginButton from './components/GitHubLoginButton';
-import useGithubAuth from '@/store/hooks/useGithubAuth';
-
-interface User {
-  name: string;
-  avatar_url: string;
-}
+import Dropdown from './components/login/DropDown';
+import GitHubLoginButton from './components/login/GitHubLoginButton';
+import { User, UnauthUser } from '@/store/types';
 
 const Login = () => {
-  const { githubSignUp } = useGithubAuth();
   const router = useRouter();
   const [username, setUsername] = useState<string>('');
   const [users, setUsers] = useState<User[]>([]);
+  const [unauthUsers, setUnauthUsers] = useState<UnauthUser[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -33,11 +28,25 @@ const Login = () => {
     }
   }, []);
 
-  const handleDropdownItemClick = useCallback((user: User) => {
-    localStorage.setItem('githubUser', JSON.stringify(user));
+  useEffect(() => {
+    const storedUnauthUsers = localStorage.getItem('unauthUsers');
+    if (storedUnauthUsers) {
+      try {
+        const parsedUnauthUsers = JSON.parse(storedUnauthUsers);
+        if (Array.isArray(parsedUnauthUsers)) {
+          setUnauthUsers(parsedUnauthUsers);
+        }
+      } catch (error) {
+        console.error('Erro ao parsear dados de usuários não autenticados:', error);
+      }
+    }
+  }, []);
+  
+
+  const handleDropdownItemClick = useCallback((user: UnauthUser) => {
+    localStorage.setItem('selectedUser', JSON.stringify(user));
     console.log('Usuário selecionado no Dropdown:', user);
-    router.push('/portfolio');
-  }, [router]);
+}, [router]);
 
   const filteredUsers = useMemo(() => {
     if (username.trim()) {
