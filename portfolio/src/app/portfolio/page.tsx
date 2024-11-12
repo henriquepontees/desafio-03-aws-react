@@ -9,8 +9,6 @@ import NavHeader from '../components/portfolio/NavHeader';
 import SocialMediaModal from '../components/portfolio/SocialMediaModal';
 import Footer from '../components/portfolio/Footer';
 import { SocialMediaLink, UserData, Experience } from "@/store/types";
-import ExperienceCard from '../components/portfolio/ExperienceCard';
-import NewExperienceCard from '../components/portfolio/NewExperienceCard';
 import ExperienceSection from '../components/portfolio/ExperienceSection';
 
 export default function Home() {
